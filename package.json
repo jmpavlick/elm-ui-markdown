@@ -1,0 +1,17 @@
+{
+  "name": "elm-ui-markdown",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "scripts": {
+    "build": "onchange -i -k '*.*' -- elm make"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "elm": "^0.19.1-5",
+    "elm-doc-preview": "^5.0.5",
+    "elm-format": "^0.8.5",
+    "onchange": "^7.1.0"
+  }
+}
