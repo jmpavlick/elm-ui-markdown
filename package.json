@@ -4,7 +4,8 @@
   "description": "",
   "main": "",
   "scripts": {
-    "build": "onchange -i -k '*.*' -- elm make"
+    "build": "onchange -i -k '*.*' -- elm make",
+    "example": "elm-go example/src/Main.elm --open --pushstate -- --debug"
   },
   "author": "",
   "license": "MIT",
@@ -12,6 +13,7 @@
     "elm": "^0.19.1-5",
     "elm-doc-preview": "^5.0.5",
     "elm-format": "^0.8.5",
+    "elm-go": "^5.0.19",
     "onchange": "^7.1.0"
   }
 }
