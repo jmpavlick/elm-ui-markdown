@@ -171,9 +171,9 @@ unorderedListItem (Block.ListItem task children) =
     Element.row []
         [ Element.el
             [ Element.paddingEach
-                { top = 0
+                { top = 4
                 , bottom = 0
-                , left = 0
+                , left = 2
                 , right = 8
                 }
             , Element.alignTop

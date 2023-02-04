@@ -1,21 +1,113 @@
 module Main exposing (..)
 
-import Html
+import Browser
+import Element exposing (Attribute, Element)
+import Element.Border as Border
+import Element.Font as Font
+import Element.Input as Input
+import Html exposing (Html)
 import Markdown.Renderer.ElmUi as Renderer
-import Markdown.Renderer.ElmUi.Internal as Internal
-import Element
+
+
+type alias Model =
+    { markdownText : String
+    , sampleText : String
+    , layout : Layout
+    }
+
+
+type Layout
+    = Columns
+    | Rows
+
+
+type Msg
+    = ClickedReset
+    | ClickedClear
+    | UpdatedMarkdownText String
+
+
+controls : Element Msg
+controls =
+    let
+        button : Msg -> String -> Element Msg
+        button onPress label =
+            Input.button [ Border.width 2, Border.rounded 4, Element.padding 4 ] { onPress = Just onPress, label = Element.text label }
+    in
+    Element.row [ Element.spacing 10, Element.padding 4, Element.width Element.fill ]
+        [ button ClickedClear "Clear"
+        , button ClickedReset "Reset"
+        ]
+
+
+input : String -> Element Msg
+input markdownText =
+    Input.multiline
+        [ Element.width Element.fill
+        , Font.family [ Font.monospace ]
+        ]
+        { onChange = UpdatedMarkdownText
+        , text = markdownText
+        , placeholder = Nothing
+        , label = Input.labelHidden "markdown editor input"
+        , spellcheck = False
+        }
+
+
+view : Model -> Html Msg
+view { markdownText } =
+    Element.layout [] <|
+        Element.column [ Element.width Element.fill ]
+            [ Element.el [ Element.width <| Element.fill, Element.alignTop ] <| controls
+            , Element.row [ Element.padding 10, Element.spacing 10, Element.width Element.fill ]
+                [ Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| input markdownText
+                , Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| preview markdownText
+                ]
+            ]
+
+
+init : Model
+init =
+    { markdownText = markdown
+    , sampleText = markdown
+    , layout = Columns
+    }
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        ClickedReset ->
+            { model | markdownText = model.sampleText }
+
+        ClickedClear ->
+            { model | markdownText = "" }
+
+        UpdatedMarkdownText umdt ->
+            { model | markdownText = umdt }
+
 
 main =
-    Element.layout [ Element.paddingXY 32 32 ] <| case Renderer.default markdown of
+    Browser.sandbox
+        { init = init
+        , view = view
+        , update = update
+        }
+
+
+preview : String -> Element msg
+preview markdownText =
+    case Renderer.default markdownText of
         Ok el ->
-            Element.column [ Element.spacingXY 16 24] el
+            Element.column [ Element.width Element.fill, Element.spacingXY 16 24 ] el
 
         Err e ->
             Debug.toString e |> Element.text
 
 
 markdown : String
-markdown = """
+markdown =
+    """
 # Markdown: Syntax
 
 *   [Overview](#overview)
