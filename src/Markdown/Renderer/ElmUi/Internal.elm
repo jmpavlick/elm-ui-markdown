@@ -26,16 +26,22 @@ heading { level, children } =
         ( size, decoration ) =
             case level of
                 Block.H1 ->
-                    ( 24, Nothing )
+                    ( 32, Nothing )
 
                 Block.H2 ->
-                    ( 20, Just Font.underline )
+                    ( 28, Nothing )
 
                 Block.H3 ->
-                    ( 18, Nothing )
+                    ( 26, Nothing )
 
-                _ ->
-                    ( 16, Nothing )
+                Block.H4 ->
+                    ( 24, Nothing )
+
+                Block.H5 ->
+                    ( 22, Nothing )
+
+                Block.H6 ->
+                    ( 20, Nothing )
 
         attrs : List (Attribute msg)
         attrs =
@@ -52,7 +58,7 @@ heading { level, children } =
 
 paragraph : List (Element msg) -> Element msg
 paragraph =
-    Element.paragraph [ Font.justify ]
+    Element.paragraph []
 
 
 thematicBreak : Element msg
@@ -107,7 +113,7 @@ link { destination } body =
     Element.newTabLink
         [ Element.htmlAttribute <| Attr.style "display" "inline-flex"
         ]
-        { url = destination, label = Element.paragraph [ Font.underline ] body }
+        { url = destination, label = Element.paragraph [ Font.color <| Element.rgb255 0x09 0x69 0xDA ] body }
 
 
 hardLineBreak : Element msg
@@ -137,11 +143,14 @@ image { src, alt, title } =
 
 
 blockQuote : List (Element msg) -> Element msg
-blockQuote =
-    Element.column
-        [ Element.padding 10
-        , Border.widthEach { top = 0, bottom = 0, right = 0, left = 10 }
-        ]
+blockQuote els =
+    Element.el [ Element.paddingXY 0 4 ] <|
+        Element.column
+            [ Element.padding 10
+            , Border.widthEach { top = 0, bottom = 0, right = 0, left = 10 }
+            , Border.color <| Element.rgba255 0xCC 0xCC 0xCC 0.7
+            ]
+            els
 
 
 unorderedListItem : Block.ListItem (Element msg) -> Element msg
@@ -171,7 +180,7 @@ unorderedListItem (Block.ListItem task children) =
             ]
             bullet
         , Element.column [ Element.width Element.fill ]
-            [ Element.paragraph
+            [ Element.column
                 [ Element.paddingXY 0 4
                 ]
                 children
@@ -193,7 +202,7 @@ orderedList startingIndex items =
                 Element.row [ Element.spacing 5 ]
                     [ Element.row [ Element.alignTop ] <|
                         Element.text
-                            (String.fromInt (index + startingIndex) ++ " ")
+                            (String.fromInt (index + startingIndex) ++ ". ")
                             :: itemBlocks
                     ]
             )
