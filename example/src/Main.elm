@@ -1,4 +1,4 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Browser
 import Element exposing (Attribute, Element)
@@ -7,11 +7,15 @@ import Element.Font as Font
 import Element.Input as Input
 import Html exposing (Html)
 import Http
+import Json.Encode as Encode
 import Markdown.Renderer.ElmUi as Renderer
 
 
+port store : Encode.Value -> Cmd msg
+
+
 type alias Model =
-    { markdownText : String
+    { markdownText : Maybe String
     , sampleText : String
     }
 
@@ -52,19 +56,34 @@ input markdownText =
 
 view : Model -> Html Msg
 view { markdownText } =
+    let
+        defaultedMarkdownText : String
+        defaultedMarkdownText =
+            Maybe.withDefault "" markdownText
+    in
     Element.layout [] <|
         Element.column [ Element.width Element.fill ]
             [ Element.el [ Element.width <| Element.fill, Element.alignTop ] <| controls
             , Element.row [ Element.padding 10, Element.spacing 10, Element.width Element.fill ]
-                [ Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| input markdownText
-                , Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| preview markdownText
+                [ Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| input defaultedMarkdownText
+                , Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| preview defaultedMarkdownText
                 ]
             ]
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( { markdownText = ""
+type alias Flags =
+    { userMarkdownText : String
+    }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init { userMarkdownText } =
+    ( { markdownText =
+            if String.isEmpty userMarkdownText then
+                Nothing
+
+            else
+                Just userMarkdownText
       , sampleText = ""
       }
     , Http.get { url = "./sample-text.md", expect = Http.expectString GotSampleText }
@@ -75,22 +94,31 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ClickedReset ->
-            ( { model | markdownText = model.sampleText }
-            , Cmd.none
+            ( { model | markdownText = Just model.sampleText }
+            , Encode.string "" |> store
             )
 
         ClickedClear ->
-            ( { model | markdownText = "" }
+            ( { model | markdownText = Nothing }
             , Cmd.none
             )
 
-        UpdatedMarkdownText umdt ->
-            ( { model | markdownText = umdt }
-            , Cmd.none
+        UpdatedMarkdownText markdownText ->
+            ( { model | markdownText = Just markdownText }
+            , Encode.string markdownText |> store
             )
 
         GotSampleText (Ok sampleText) ->
-            ( { model | markdownText = sampleText, sampleText = sampleText }
+            ( { model
+                | sampleText = sampleText
+                , markdownText =
+                    case model.markdownText of
+                        Nothing ->
+                            Just sampleText
+
+                        Just userMarkdownText ->
+                            Just userMarkdownText
+              }
             , Cmd.none
             )
 
@@ -98,10 +126,10 @@ update msg model =
             ( model, Cmd.none )
 
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
     Browser.document
-        { init = \_ -> init
+        { init = init
         , view = view >> List.singleton >> (\body -> { title = "elm-ui-markdown", body = body })
         , update = update
         , subscriptions = \_ -> Sub.none

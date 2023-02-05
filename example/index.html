@@ -9,7 +9,7 @@
 <script>
       let app = Elm.Main.init(
           { node: document.getElementById('elm')
-          , flags : { userMarkdownText : localStorage.getItem('userMarkdownText') } 
+          , flags : { userMarkdownText : JSON.parse(localStorage.getItem('userMarkdownText')) } 
           }
       );
       
