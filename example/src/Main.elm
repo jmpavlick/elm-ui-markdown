@@ -11,20 +11,21 @@ import Json.Encode as Encode
 import Markdown.Renderer.ElmUi as Renderer
 
 
-port store : Encode.Value -> Cmd msg
-
-
-type alias Model =
-    { markdownText : Maybe String
-    , sampleText : String
-    }
-
-
-type Msg
-    = ClickedReset
-    | ClickedClear
-    | UpdatedMarkdownText String
-    | GotSampleText (Result Http.Error String)
+view : Model -> Html Msg
+view { markdownText } =
+    let
+        defaultedMarkdownText : String
+        defaultedMarkdownText =
+            Maybe.withDefault "" markdownText
+    in
+    Element.layout [] <|
+        Element.column [ Element.width Element.fill ]
+            [ Element.el [ Element.width <| Element.fill, Element.alignTop ] <| controls
+            , Element.row [ Element.padding 10, Element.spacing 10, Element.width Element.fill ]
+                [ Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| input defaultedMarkdownText
+                , Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| preview defaultedMarkdownText
+                ]
+            ]
 
 
 controls : Element Msg
@@ -54,40 +55,17 @@ input markdownText =
         }
 
 
-view : Model -> Html Msg
-view { markdownText } =
-    let
-        defaultedMarkdownText : String
-        defaultedMarkdownText =
-            Maybe.withDefault "" markdownText
-    in
-    Element.layout [] <|
-        Element.column [ Element.width Element.fill ]
-            [ Element.el [ Element.width <| Element.fill, Element.alignTop ] <| controls
-            , Element.row [ Element.padding 10, Element.spacing 10, Element.width Element.fill ]
-                [ Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| input defaultedMarkdownText
-                , Element.el [ Element.width <| Element.fillPortion 1, Element.alignTop ] <| preview defaultedMarkdownText
-                ]
-            ]
+preview : String -> Element msg
+preview markdownText =
+    case Renderer.default markdownText of
+        Ok [] ->
+            Element.el [ Font.family [ Font.monospace ], Font.italic, Font.color <| Element.rgba255 0xCC 0xCC 0xCC 0.7 ] <| Element.text "Start typing."
 
+        Ok elements ->
+            Element.column [ Element.width Element.fill, Element.spacingXY 16 24 ] elements
 
-type alias Flags =
-    { userMarkdownText : String
-    }
-
-
-init : Flags -> ( Model, Cmd Msg )
-init { userMarkdownText } =
-    ( { markdownText =
-            if String.isEmpty userMarkdownText then
-                Nothing
-
-            else
-                Just userMarkdownText
-      , sampleText = ""
-      }
-    , Http.get { url = "./sample-text.md", expect = Http.expectString GotSampleText }
-    )
+        Err e ->
+            Debug.toString e |> Element.text
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -126,6 +104,45 @@ update msg model =
             ( model, Cmd.none )
 
 
+
+--
+
+
+port store : Encode.Value -> Cmd msg
+
+
+type Msg
+    = ClickedReset
+    | ClickedClear
+    | UpdatedMarkdownText String
+    | GotSampleText (Result Http.Error String)
+
+
+init : Flags -> ( Model, Cmd Msg )
+init { userMarkdownText } =
+    ( { markdownText =
+            if String.isEmpty userMarkdownText then
+                Nothing
+
+            else
+                Just userMarkdownText
+      , sampleText = ""
+      }
+    , Http.get { url = "./sample-text.md", expect = Http.expectString GotSampleText }
+    )
+
+
+type alias Model =
+    { markdownText : Maybe String
+    , sampleText : String
+    }
+
+
+type alias Flags =
+    { userMarkdownText : String
+    }
+
+
 main : Program Flags Model Msg
 main =
     Browser.document
@@ -134,16 +151,3 @@ main =
         , update = update
         , subscriptions = \_ -> Sub.none
         }
-
-
-preview : String -> Element msg
-preview markdownText =
-    case Renderer.default markdownText of
-        Ok [] ->
-            Element.el [ Font.family [ Font.monospace ], Font.italic, Font.color <| Element.rgba255 0xCC 0xCC 0xCC 0.7 ] <| Element.text "Start typing."
-
-        Ok elements ->
-            Element.column [ Element.width Element.fill, Element.spacingXY 16 24 ] elements
-
-        Err e ->
-            Debug.toString e |> Element.text
