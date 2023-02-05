@@ -4,7 +4,9 @@
   "description": "",
   "main": "",
   "scripts": {
-    "build": "onchange -i -k '*.*' -- elm make"
+    "build": "npm run package-build && cd example && elm make src/Main.elm --optimize --output=main.js",
+    "package-build": "cd example && elm make src/Main.elm --optimize --output=/dev/null",
+    "example": "cd example && elm-go src/Main.elm --open --pushstate -- --debug --output=main.js"
   },
   "author": "",
   "license": "MIT",
@@ -12,6 +14,7 @@
     "elm": "^0.19.1-5",
     "elm-doc-preview": "^5.0.5",
     "elm-format": "^0.8.5",
+    "elm-go": "^5.0.19",
     "onchange": "^7.1.0"
   }
 }

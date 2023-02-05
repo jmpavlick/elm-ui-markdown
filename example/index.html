@@ -1,0 +1,20 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="./main.js"></script>
+</head>
+<body>
+<div id="elm"></div>
+</body>
+<script>
+      let app = Elm.Main.init(
+          { node: document.getElementById('elm')
+          , flags : { userMarkdownText : JSON.parse(localStorage.getItem('userMarkdownText')) || "" } 
+          }
+      );
+      
+      app.ports.store.subscribe(userMarkdownText => {
+          localStorage.setItem('userMarkdownText', JSON.stringify(userMarkdownText));
+      });
+    </script>
+</html>
