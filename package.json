@@ -5,7 +5,7 @@
   "main": "",
   "scripts": {
     "build": "onchange -i -k '*.*' -- elm make",
-    "example": "cd example && elm-go src/Main.elm --open --pushstate -- --debug"
+    "example": "cd example && elm-go src/Main.elm --open --pushstate -- --debug --output=main.js"
   },
   "author": "",
   "license": "MIT",
