@@ -64,8 +64,8 @@ preview markdownText =
         Ok elements ->
             Element.column [ Element.width Element.fill, Element.spacingXY 16 24 ] elements
 
-        Err e ->
-            Debug.toString e |> Element.text
+        Err _ ->
+            "Something went wrong!" |> Element.text
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
