@@ -227,7 +227,7 @@ tableHeader : List (Element msg) -> Element msg
 tableHeader children =
     Element.column [ Element.width Element.fill ]
         [ Element.row [ Font.bold, Element.width Element.fill ] <|
-            List.map (\td -> Element.el [ Element.width <| Element.fillPortion <| List.length children ] td)
+            List.map (wrapTd <| List.length children)
                 children
         ]
 
@@ -240,17 +240,44 @@ tableBody =
 tableRow : List (Element msg) -> Element msg
 tableRow children =
     Element.column [ Element.width Element.fill ]
-        [ Element.row [ Element.width Element.fill, Element.paddingXY 0 4 ] <|
-            List.map (\td -> Element.el [ Element.width <| Element.fillPortion <| List.length children ] td)
+        [ Element.row
+            [ Element.width Element.fill
+            , Element.paddingXY 0 4
+            ]
+          <|
+            List.map (wrapTd <| List.length children)
                 children
         ]
 
 
 tableCell : Maybe Block.Alignment -> List (Element msg) -> Element msg
-tableCell _ =
-    Element.paragraph []
+tableCell alignment =
+    Element.paragraph <| align alignment
 
 
 tableHeaderCell : Maybe Block.Alignment -> List (Element msg) -> Element msg
-tableHeaderCell _ =
-    Element.paragraph []
+tableHeaderCell alignment =
+    Element.paragraph <| align alignment
+
+
+wrapTd : Int -> Element msg -> Element msg
+wrapTd fillPortion el =
+    Element.el [ Element.width <| Element.fillPortion fillPortion ] el
+
+
+align : Maybe Block.Alignment -> List (Attribute msg)
+align alignment =
+    case alignment of
+        Nothing ->
+            [ Element.htmlAttribute <| Attr.attribute "" "" ]
+
+        Just a ->
+            case a of
+                Block.AlignLeft ->
+                    [ Element.alignLeft, Font.alignLeft ]
+
+                Block.AlignRight ->
+                    [ Element.alignRight, Font.alignRight ]
+
+                Block.AlignCenter ->
+                    [ Element.centerX, Font.center ]
