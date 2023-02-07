@@ -5,9 +5,10 @@
   "main": "",
   "scripts": {
     "build": "npm run package-build && cd example && elm make src/Main.elm --optimize --output=main.js",
-    "package-build": "cd example && elm make src/Main.elm --optimize --output=/dev/null",
     "example": "cd example && elm-go src/Main.elm --open --pushstate -- --debug --output=main.js",
-    "preview": "npm run package-build && elm-doc-preview"
+    "package-build": "cd example && elm make src/Main.elm --optimize --output=/dev/null",
+    "preview": "npm run package-build && elm-doc-preview",
+    "verify": "onchange -i -k -- elm-verify-examples --run-tests"
   },
   "author": "",
   "license": "MIT",
@@ -16,6 +17,7 @@
     "elm-doc-preview": "^5.0.5",
     "elm-format": "^0.8.5",
     "elm-go": "^5.0.19",
+    "elm-test": "^0.19.1-revision9",
     "elm-verify-examples": "^5.2.0",
     "onchange": "^7.1.0"
   }

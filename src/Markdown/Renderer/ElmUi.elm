@@ -105,6 +105,8 @@ type Error
             |> Result.mapError
                 (\_ -> Element.text "Something went wrong!")
 
+    view markdown --> Element.column [] []
+
 -}
 default : String -> Result Error (List (Element msg))
 default markdownInput =
