@@ -13,7 +13,7 @@ renderer : Renderer (Element msg)
 renderer =
     { heading = Internal.heading
     , paragraph = Internal.paragraph
-    , thematicBreak = Internal.thematicBreak
+    , thematicBreak = Internal.thematicBreak 2
     , text = Internal.text
     , strong = Internal.strong
     , emphasis = Internal.emphasis

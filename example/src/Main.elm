@@ -8,6 +8,8 @@ import Element.Input as Input
 import Html exposing (Html)
 import Http
 import Json.Encode as Encode
+import Markdown.Block exposing (Block)
+import Markdown.Parser as Parser
 import Markdown.Renderer.ElmUi as Renderer
 
 
@@ -82,7 +84,10 @@ update msg model =
             )
 
         UpdatedMarkdownText markdownText ->
-            ( { model | markdownText = Just markdownText }
+            ( { model
+                | markdownText = Just markdownText
+                , ast = Parser.parse markdownText |> Result.withDefault []
+              }
             , Encode.string markdownText |> store
             )
 
@@ -127,6 +132,7 @@ init { userMarkdownText } =
             else
                 Just userMarkdownText
       , sampleText = ""
+      , ast = Parser.parse userMarkdownText |> Result.withDefault []
       }
     , Http.get { url = "./sample-text.md", expect = Http.expectString GotSampleText }
     )
@@ -135,6 +141,7 @@ init { userMarkdownText } =
 type alias Model =
     { markdownText : Maybe String
     , sampleText : String
+    , ast : List Block
     }
 
 

@@ -10,9 +10,14 @@ import Html.Attributes as Attr
 import Markdown.Block as Block
 
 
-values : List (Maybe a) -> List a
-values =
-    List.filterMap identity
+colors :
+    { link : Element.Color
+    , accent : Element.Color
+    }
+colors =
+    { link = Element.rgb255 0x09 0x69 0xDA
+    , accent = Element.rgba255 0xCC 0xCC 0xCC 0.7
+    }
 
 
 heading :
@@ -26,34 +31,32 @@ heading { level, children } =
         ( size, decoration ) =
             case level of
                 Block.H1 ->
-                    ( 32, Nothing )
+                    ( 32, thematicBreak 1 )
 
                 Block.H2 ->
-                    ( 28, Nothing )
+                    ( 28, thematicBreak 1 )
 
                 Block.H3 ->
-                    ( 26, Nothing )
+                    ( 26, Element.none )
 
                 Block.H4 ->
-                    ( 24, Nothing )
+                    ( 24, Element.none )
 
                 Block.H5 ->
-                    ( 22, Nothing )
+                    ( 22, Element.none )
 
                 Block.H6 ->
-                    ( 20, Nothing )
-
-        attrs : List (Attribute msg)
-        attrs =
-            decoration
-                :: List.map Just
-                    [ Font.size size
-                    , Font.bold
-                    , Region.heading <| Block.headingLevelToInt level
-                    ]
-                |> values
+                    ( 20, Element.none )
     in
-    Element.paragraph attrs children
+    Element.column [ Element.width Element.fill ]
+        [ Element.paragraph
+            [ Font.size size
+            , Font.bold
+            , Region.heading <| Block.headingLevelToInt level
+            ]
+            children
+        , decoration
+        ]
 
 
 paragraph : List (Element msg) -> Element msg
@@ -61,15 +64,16 @@ paragraph =
     Element.paragraph []
 
 
-thematicBreak : Element msg
-thematicBreak =
+thematicBreak : Int -> Element msg
+thematicBreak thickness =
     Element.el
         [ Element.width <| Element.fill
         , Element.paddingXY 0 10
         ]
     <|
         Element.el
-            [ Border.widthEach { top = 1, bottom = 1, left = 0, right = 0 }
+            [ Border.widthEach { top = thickness, bottom = 0, left = 0, right = 0 }
+            , Border.color colors.accent
             , Element.height <| Element.px 0
             , Element.width <| Element.fill
             , Element.height <| Element.px 0
@@ -113,7 +117,7 @@ link { destination } body =
     Element.newTabLink
         [ Element.htmlAttribute <| Attr.style "display" "inline-flex"
         ]
-        { url = destination, label = Element.paragraph [ Font.color <| Element.rgb255 0x09 0x69 0xDA ] body }
+        { url = destination, label = Element.paragraph [ Font.color <| colors.link ] body }
 
 
 hardLineBreak : Element msg
@@ -148,7 +152,7 @@ blockQuote els =
         Element.column
             [ Element.padding 10
             , Border.widthEach { top = 0, bottom = 0, right = 0, left = 10 }
-            , Border.color <| Element.rgba255 0xCC 0xCC 0xCC 0.7
+            , Border.color <| colors.accent
             ]
             els
 
@@ -216,22 +220,30 @@ codeBlock { body } =
 
 table : List (Element msg) -> Element msg
 table =
-    Element.column []
+    Element.column [ Element.width Element.fill ]
 
 
 tableHeader : List (Element msg) -> Element msg
-tableHeader =
-    Element.column []
+tableHeader children =
+    Element.column [ Element.width Element.fill ]
+        [ Element.row [ Font.bold, Element.width Element.fill ] <|
+            List.map (\td -> Element.el [ Element.width <| Element.fillPortion <| List.length children ] td)
+                children
+        ]
 
 
 tableBody : List (Element msg) -> Element msg
 tableBody =
-    Element.column []
+    Element.column [ Element.width Element.fill ]
 
 
 tableRow : List (Element msg) -> Element msg
-tableRow =
-    Element.row []
+tableRow children =
+    Element.column [ Element.width Element.fill ]
+        [ Element.row [ Element.width Element.fill, Element.paddingXY 0 4 ] <|
+            List.map (\td -> Element.el [ Element.width <| Element.fillPortion <| List.length children ] td)
+                children
+        ]
 
 
 tableCell : Maybe Block.Alignment -> List (Element msg) -> Element msg
