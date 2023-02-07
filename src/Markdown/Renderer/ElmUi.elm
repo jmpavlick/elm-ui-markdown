@@ -50,3 +50,12 @@ default markdownInput =
                 Renderer.render renderer blocks
                     |> Result.mapError RenderError
             )
+
+
+defaultWrapped : String -> Result Error (Element msg)
+defaultWrapped markdownInput =
+    default markdownInput
+        |> Result.map
+            (\elements ->
+                Element.column [ Element.width Element.fill, Element.spacingXY 16 24 ] elements
+            )
