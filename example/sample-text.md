@@ -33,3 +33,7 @@ Here's a paragraph. A paragraph is a collection of `Element msg` values.
 > > or if you want a series of nested blockquotes,
 > > > elm-ui-markdown has got your back.
 
+|This|is|a|table|
+|:---|--|:-:|----:|
+|This column|This column|This column|This column|
+|is left-aligned|has default alignment|is center-aligned|is right-aligned|

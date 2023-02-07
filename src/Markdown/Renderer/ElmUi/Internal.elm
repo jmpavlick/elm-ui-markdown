@@ -269,7 +269,7 @@ align : Maybe Block.Alignment -> List (Attribute msg)
 align alignment =
     case alignment of
         Nothing ->
-            [ Element.htmlAttribute <| Attr.attribute "" "" ]
+            []
 
         Just a ->
             case a of
