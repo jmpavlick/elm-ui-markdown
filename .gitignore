@@ -3,4 +3,4 @@ elm-stuff
 node_modules
 *.js
 .idea/*
-./tests/VerifyExamples
+**/VerifyExamples/*
