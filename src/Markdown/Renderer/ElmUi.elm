@@ -89,11 +89,14 @@ type Error
 
 {-| Fast-path to render Markdown; returns the output from `Markdown.Renderer.render` as a `List (Element msg)`.
 
+    import Element exposing (Element)
+    import Result.Extra as ResultX
+
     markdown : String
     markdown =
         "# This is a H1"
 
-    view : String -> Element msg
+    view : String -> Result Error (Element msg)
     view md =
         default md
             |> Result.map
@@ -102,10 +105,8 @@ type Error
                     , Element.spacingXY 16 24
                     ]
                 )
-            |> Result.mapError
-                (\_ -> Element.text "Something went wrong!")
 
-    view markdown --> Element.column [] []
+    view markdown |> ResultX.isOk --> True
 
 -}
 default : String -> Result Error (List (Element msg))
@@ -135,9 +136,9 @@ Here's how you could use it:
     view : String -> Element msg
     view md =
         defaultWrapped md
-            |> Result.map identity
             |> Result.mapError
                 (\_ -> Element.text "Something went wrong!")
+            |> ResultX.merge
 
 -}
 defaultWrapped : String -> Result Error (Element msg)

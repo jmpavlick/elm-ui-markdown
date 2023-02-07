@@ -8,7 +8,7 @@
     "example": "cd example && elm-go src/Main.elm --open --pushstate -- --debug --output=main.js",
     "package-build": "cd example && elm make src/Main.elm --optimize --output=/dev/null",
     "preview": "npm run package-build && elm-doc-preview",
-    "verify": "onchange -i -k ./Markdown/* -- elm-verify-examples --run-tests"
+    "verify": "onchange -i -k ./src/Markdown/Renderer/ElmUi.elm -- elm-verify-examples --run-tests"
   },
   "author": "",
   "license": "MIT",
