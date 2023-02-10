@@ -42,6 +42,18 @@ Here's a paragraph. A paragraph is a collection of `Element msg` values.
 
 ----
 
+* This is an unordered list
+* It can have as many items as you want
+  * It can indent, too! Indentations are two whitespaces.
+  * Unfortunately, I'm not clever enough to figure out how to use different glyphs
+  * At different levels of indentation
+    * But if _you_ are, please submit a PR so that I can see how you did it
+      * 🙏🙏🙏
+
+1. This is an ordered list
+1. It works exactly as you'd expect
+1. All good lists have a third thing
+
 Here's a code block:
 
 ```
